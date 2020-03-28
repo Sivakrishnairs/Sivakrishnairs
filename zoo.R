@@ -1,0 +1,19 @@
+library(readr)
+zoo<-read.csv(file.choose())
+table(zoo$type)
+table(zoo$catsize)
+normalize<-function(x){
+  return((x-min(x))/(max(x)-min(x)))
+}
+str(zoo_1)
+zoo_1<-factor((zoo[2:17]))
+zoo_n<-as.data.frame(lapply(zoo[2:17],normalize))
+zoo_train<-zoo[1:50,]
+zoo_test<-zoo[51:101,]
+zoo_train_label<-zoo[1:50,18]
+zoo_test_label<-zoo[51:101,18]
+library(class)
+library(gmodels)
+zoo_test_pred<-knn(train=zoo_train,test=zoo_test,cl=zoo_train_label,k=1)
+sum(is.na(zoo))
+glass_test_pred<-knn(train=glass_train,test=glass_test,cl=glass_train_lable,k=1)
