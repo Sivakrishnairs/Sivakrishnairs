@@ -1,0 +1,17 @@
+library(readr)
+salary1<-read.csv(file.choose())
+View(salary1)
+str(salary1)
+attach(salary1)
+library(caret)
+library(caTools)
+train<-salary1[1:30000,]
+test<-salary1[30001:30161,]
+prop.table(table(train$Salary))
+prop.table(table(test$Salary))
+prop.table(table(salary1$Salary))
+library(kernlab)
+attach(salary1)
+model<-ksvm(Salary~.,data=train, kernel="vanilla")
+sal_pred<-predict(model,newdata=test)
+confusionMatrix(table(sal_pred,test$Salary))
