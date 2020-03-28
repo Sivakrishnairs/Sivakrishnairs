@@ -1,0 +1,51 @@
+library(rvest)
+library(XML)
+library(magrittr)
+aurl<-"https://www.amazon.in/Kodak-inches-Ready-Smart-32HDXSMART/product-reviews/B07R72W9K8/ref=cm_cr_getr_d_paging_btm_prev_1?ie=UTF8&reviewerType=all_reviews&pageNumber"
+amazon_reviews <- NULL
+for (i in 1:30){
+  murl <- read_html(as.character(paste(aurl,i,sep="=")))
+  rev <- murl %>%
+    html_nodes(".review-text") %>%
+    html_text()
+  amazon_reviews <- c(amazon_reviews,rev)
+}
+write.table(amazon_reviews,"kodak.txt",row.names = F)
+getwd()
+str(amazon_reviews)
+View(amazon_reviews)
+install.packages("tm")
+library(tm)
+x<-Corpus(VectorSource(amazon_reviews))
+inspect(x[1])
+x<-tm_map(x, function(x)iconv(enc2utf8(x),sub="byte"))
+x1<-tm_map(x,tolower)
+x1<-tm_map(x1,removePunctuation)
+x1<-tm_map(x1, removeNumbers)
+inspect(x1[1])
+x1<-tm_map(x1, removeWords,stopwords("english"))
+x1<-tm_map(x1,stripWhitespace)
+tdm<-TermDocumentMatrix(x1)
+tdm
+dtm<-DocumentTermMatrix(x1)
+tdm<-as.matrix(tdm)
+tdm[1:20,1:20]
+W <- rowSums(tdm)
+w_sub<-subset(W, W>=30)
+barplot(w_sub, las=2, col=rainbow(30))
+x1<-tm_map(x1, removeWords,c("also", "using"))
+x1<-tm_map(x1,stripWhitespace)
+tdm<-TermDocumentMatrix(x1)
+dtm<-DocumentTermMatrix(x1)
+tdm<-as.matrix(tdm)
+w<-rowSums(tdm)
+w_sub<-subset(w,w>=30)
+barplot(w_sub,las=2,col=rainbow(30))
+install.packages("wordcloud")
+library(wordcloud)
+w_sub1<-sort(rowSums(tdm), decreasing = TRUE)
+wordcloud(words = names(w_sub), freq = w_sub)
+wordcloud(words = names(w_sub1), freq = w_sub1)
+wordcloud(words=names(w_sub1),freq=w_sub1,random.order=F,colors=rainbow(30),scale=c(2,0.5),rot.per=0.4)))
+wordcloud(words=names(w_sub1),freq = w_sub1,random.order = F, colors = rainbow(30),scale=c(2,0.5),rot.per = 0.4)
+wind
